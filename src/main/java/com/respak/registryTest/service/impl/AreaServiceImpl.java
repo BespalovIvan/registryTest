@@ -6,8 +6,10 @@ import com.respak.registryTest.repository.AreaRepository;
 import com.respak.registryTest.service.AreaService;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -35,13 +37,21 @@ public class AreaServiceImpl implements AreaService {
 
     @Override
     public AreaDto findByName(String name) {
-        Area area = areaRepository.findByName(name);
+        Optional<Area> optionalArea = areaRepository.findByName(name);
+        Area area = optionalArea.orElseThrow(RuntimeException::new);
         return new AreaDto(area.getName(), area.getAreaCode());
     }
 
     @Override
     public AreaDto findByAreaCode(Long areaCode) {
-        Area area = areaRepository.findByAreaCode(areaCode);
+        Optional<Area> optionalArea = areaRepository.findByAreaCode(areaCode);
+        Area area = optionalArea.orElseThrow(RuntimeException::new);
         return new AreaDto(area.getName(), area.getAreaCode());
+    }
+
+    @Transactional
+    @Override
+    public void updateArea(AreaDto areaDto) {
+        areaRepository.updateArea(areaDto.getName(),areaDto.getAreaCode(),areaDto.getAreaId());
     }
 }

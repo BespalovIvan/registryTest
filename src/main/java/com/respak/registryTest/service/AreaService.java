@@ -8,7 +8,12 @@ import java.util.UUID;
 
 public interface AreaService {
     UUID addArea(AreaDto areaDto);
-    List<AreaDto> findAll ();
+
+    List<AreaDto> findAll();
+
     AreaDto findByName(String name);
+
     AreaDto findByAreaCode(Long areaCode);
+
+    void updateArea(AreaDto areaDto);
 }

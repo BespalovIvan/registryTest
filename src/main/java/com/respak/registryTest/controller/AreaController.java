@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api")
 public class AreaController {
     private final AreaService areaService;
 
@@ -17,24 +18,30 @@ public class AreaController {
         this.areaService = areaService;
     }
 
-    @PostMapping("/api/add")
+    @PostMapping("/areas")
     public ResponseEntity<String> createArea(@Validated @RequestBody AreaDto areaDto) {
         areaService.addArea(areaDto);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/api/areas")
+    @GetMapping("/areas")
     public ResponseEntity<List<AreaDto>> findAllArea() {
         return new ResponseEntity<>(areaService.findAll(), HttpStatus.OK);
     }
 
-    @GetMapping("/api/areas/name/{name}")
-    public ResponseEntity<AreaDto> findByNameAndAreaCode(@PathVariable("name") String name) {
+    @GetMapping("/areas/name/{name}")
+    public ResponseEntity<AreaDto> findByName(@PathVariable("name") String name) {
         return new ResponseEntity<>(areaService.findByName(name), HttpStatus.OK);
     }
 
-    @GetMapping("/api/areas/areacode/{areaCode}")
-    public ResponseEntity<AreaDto> findByNameAndAreaCode(@PathVariable("areaCode") Long areaCode) {
+    @GetMapping("/areas/areacode/{areaCode}")
+    public ResponseEntity<AreaDto> findByAreaCode(@PathVariable("areaCode") Long areaCode) {
         return new ResponseEntity<>(areaService.findByAreaCode(areaCode), HttpStatus.OK);
+    }
+
+    @PutMapping("/areas")
+    public ResponseEntity<String> updateArea(@RequestBody AreaDto areaDto) {
+        areaService.updateArea(areaDto);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
