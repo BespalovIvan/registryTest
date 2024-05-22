@@ -19,5 +19,8 @@ public interface AreaRepository extends JpaRepository<Area, UUID> {
     @Modifying
     @Query("UPDATE Area SET name = :name, area_code = :area_code WHERE id = :area_id ")
     void updateArea(@Param("name") String name,@Param("area_code") Long areaCode,@Param("area_id") UUID areaId);
+    @Modifying
+    @Query("UPDATE Area SET isArchive = true WHERE id = :area_id ")
+    void toArchive(@Param("area_id") UUID areaId);
 
 }

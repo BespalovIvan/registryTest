@@ -16,4 +16,5 @@ public interface AreaService {
     AreaDto findByAreaCode(Long areaCode);
 
     void updateArea(AreaDto areaDto);
+    void toArchive(AreaDto areaDto);
 }

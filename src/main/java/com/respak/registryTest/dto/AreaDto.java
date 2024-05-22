@@ -6,14 +6,12 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class AreaDto {
-    @NotNull
     private UUID areaId;
     @NotEmpty
     @Column(name = "name")
@@ -24,5 +22,9 @@ public class AreaDto {
     public AreaDto(String name, Long areaCode) {
         this.name = name;
         this.areaCode = areaCode;
+    }
+
+    public AreaDto(UUID areaId) {
+        this.areaId = areaId;
     }
 }

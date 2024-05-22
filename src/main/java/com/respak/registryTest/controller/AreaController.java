@@ -44,4 +44,9 @@ public class AreaController {
         areaService.updateArea(areaDto);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+    @PutMapping("/areas/archive")
+    public ResponseEntity<String> makeArchival(@RequestBody AreaDto areaDto) {
+        areaService.toArchive(areaDto);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

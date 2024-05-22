@@ -35,4 +35,10 @@ public class Area {
         this.name = name;
         this.areaCode = areaCode;
     }
+
+    public Area(String name, Long areaCode, Boolean isArchive) {
+        this.name = name;
+        this.areaCode = areaCode;
+        this.isArchive = isArchive;
+    }
 }
