@@ -21,23 +21,24 @@ public class AreaServiceImpl implements AreaService {
     }
 
     @Override
-    public UUID addArea(AreaDto areaDto) {
-        return areaRepository.save(new Area(areaDto.getName(), areaDto.getAreaCode(),false)).getAreaId();
+    public void addArea(AreaDto areaDto) {
+        areaRepository.save(new Area(areaDto.getName(), areaDto.getAreaCode(), false));
+    }
+
+    @Override
+    public Area findById(UUID areaId) {
+        return areaRepository.findById(areaId).orElseThrow(() -> new RuntimeException("Active area with id not found"));
     }
 
     @Override
     public List<AreaDto> findAll() {
         List<Area> allAreas = areaRepository.findAll();
-        if(allAreas.isEmpty()){
-            throw new RuntimeException("Active areas not found");
-        }
         List<AreaDto> areaDtos = new ArrayList<>();
         for (Area area : allAreas) {
             if (!area.getIsArchive()) {
                 areaDtos.add(new AreaDto(area.getName(), area.getAreaCode()));
             }
         }
-
         return areaDtos;
     }
 

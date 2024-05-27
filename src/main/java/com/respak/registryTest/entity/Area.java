@@ -1,17 +1,19 @@
 package com.respak.registryTest.entity;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import java.util.Set;
 import java.util.UUID;
 
-@Entity
+
 @Table(name = "areas")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Entity
 public class Area {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -24,11 +26,9 @@ public class Area {
     private Long areaCode;
     @Column(name = "is_archive")
     private Boolean isArchive;
-    @OneToMany
-    @JoinColumn(name = "registration_farmer_id")
+    @OneToMany(mappedBy = "registrationArea",cascade = CascadeType.ALL,orphanRemoval = true)
     private Set<Farmer> registrationFarmers;
-    @ManyToMany
-    @JoinColumn(name = "farmer_id")
+    @ManyToMany(mappedBy = "cropFieldsArea")
     private Set<Farmer> cropFieldsAreaFarmers;
 
     public Area(String name, Long areaCode) {
@@ -40,5 +40,9 @@ public class Area {
         this.name = name;
         this.areaCode = areaCode;
         this.isArchive = isArchive;
+    }
+
+    public Area(UUID areaId) {
+        this.areaId = areaId;
     }
 }

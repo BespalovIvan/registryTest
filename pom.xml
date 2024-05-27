@@ -12,6 +12,7 @@
         <lombok-version>1.18.30</lombok-version>
         <postgresql.version>42.7.3</postgresql.version>
         <junit.version>3.8.1</junit.version>
+        <jackson-datatype-jsr310.version>2.9.8</jackson-datatype-jsr310.version>
     </properties>
 
     <parent>
@@ -46,6 +47,11 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>${postgresql.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>${jackson-datatype-jsr310.version}</version>
         </dependency>
     </dependencies>
     <build>

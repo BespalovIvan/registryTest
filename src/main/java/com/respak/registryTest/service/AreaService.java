@@ -2,12 +2,15 @@ package com.respak.registryTest.service;
 
 
 import com.respak.registryTest.dto.AreaDto;
+import com.respak.registryTest.entity.Area;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface AreaService {
-    UUID addArea(AreaDto areaDto);
+    void addArea(AreaDto areaDto);
+
+    Area findById(UUID areaId);
 
     List<AreaDto> findAll();
 
@@ -16,5 +19,6 @@ public interface AreaService {
     AreaDto findByAreaCode(Long areaCode);
 
     void updateArea(AreaDto areaDto);
+
     void toArchive(AreaDto areaDto);
 }
