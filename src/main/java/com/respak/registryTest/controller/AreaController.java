@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/areas")
 public class AreaController {
     private final AreaService areaService;
 
@@ -18,33 +18,33 @@ public class AreaController {
         this.areaService = areaService;
     }
 
-    @PostMapping("/areas")
+    @PostMapping("")
     public ResponseEntity<String> createArea(@Validated @RequestBody AreaDto areaDto) {
         areaService.addArea(areaDto);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/areas")
+    @GetMapping("")
     public ResponseEntity<List<AreaDto>> findAllArea() {
         return new ResponseEntity<>(areaService.findAll(), HttpStatus.OK);
     }
 
-    @GetMapping("/areas/name/{name}")
+    @GetMapping("/name/{name}")
     public ResponseEntity<AreaDto> findByName(@PathVariable("name") String name) {
         return new ResponseEntity<>(areaService.findByName(name), HttpStatus.OK);
     }
 
-    @GetMapping("/areas/areacode/{areaCode}")
+    @GetMapping("/areacode/{areaCode}")
     public ResponseEntity<AreaDto> findByAreaCode(@PathVariable("areaCode") Long areaCode) {
         return new ResponseEntity<>(areaService.findByAreaCode(areaCode), HttpStatus.OK);
     }
 
-    @PutMapping("/areas")
+    @PutMapping("")
     public ResponseEntity<String> updateArea(@RequestBody AreaDto areaDto) {
         areaService.updateArea(areaDto);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-    @PutMapping("/areas/archive")
+    @PutMapping("/archive")
     public ResponseEntity<String> makeArchival(@RequestBody AreaDto areaDto) {
         areaService.toArchive(areaDto);
         return new ResponseEntity<>(HttpStatus.OK);

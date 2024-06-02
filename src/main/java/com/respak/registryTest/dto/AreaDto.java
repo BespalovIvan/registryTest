@@ -1,6 +1,6 @@
 package com.respak.registryTest.dto;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -9,9 +9,9 @@ import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class AreaDto {
+
     private UUID areaId;
     @NotEmpty
     private String name;
@@ -25,5 +25,11 @@ public class AreaDto {
 
     public AreaDto(UUID areaId) {
         this.areaId = areaId;
+    }
+
+    public AreaDto(UUID areaId, String name, Long areaCode) {
+        this.areaId = areaId;
+        this.name = name;
+        this.areaCode = areaCode;
     }
 }

@@ -1,5 +1,6 @@
 package com.respak.registryTest.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -66,5 +67,17 @@ public class Farmer {
 
     public Farmer(UUID farmerId) {
         this.farmerId = farmerId;
+    }
+
+    public Farmer(Long ogrn, Long kpp, Long inn, String organizationalAndLegalForm,
+                  String organizationName, UUID farmerId, LocalDate registrationDate, Boolean isArchive) {
+        this.ogrn = ogrn;
+        this.kpp = kpp;
+        this.inn = inn;
+        this.organizationalAndLegalForm = organizationalAndLegalForm;
+        this.organizationName = organizationName;
+        this.farmerId = farmerId;
+        this.registrationDate = registrationDate;
+        this.isArchive = isArchive;
     }
 }
