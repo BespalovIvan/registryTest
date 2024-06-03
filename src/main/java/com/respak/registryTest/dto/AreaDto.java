@@ -1,6 +1,5 @@
 package com.respak.registryTest.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,7 +10,6 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 public class AreaDto {
-
     private UUID areaId;
     @NotEmpty
     private String name;

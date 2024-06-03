@@ -12,7 +12,7 @@ public interface AreaService {
 
     Area findById(UUID areaId);
 
-    List<AreaDto> findAll();
+    List<AreaDto> findAllActiveAreas();
 
     AreaDto findByName(String name);
 

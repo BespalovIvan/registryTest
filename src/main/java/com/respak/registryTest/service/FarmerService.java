@@ -12,6 +12,19 @@ public interface FarmerService {
 
     void toArchive(FarmerDto farmerDto);
 
+    void reArchive(FarmerDto farmerDto);
+
     FarmerDto findActiveFarmerByOrganizationName(String organizationName);
-    void registerFarmer (UUID farmerId,UUID areaId);
+
+    void registerFarmer(UUID farmerId, UUID areaId);
+
+    void addCropFieldToFarmer(UUID farmerId, UUID areaId);
+
+    FarmerDto findActiveFarmerByInn(Long inn);
+
+    List<FarmerDto> findActiveFarmerByRegistrationArea(UUID areaId);
+
+    List<FarmerDto> findByRegistrationDate(String registrationDate);
+
+    List<FarmerDto> findByIsArchive(Boolean isArchive);
 }

@@ -30,38 +30,29 @@ public class AreaServiceImpl implements AreaService {
         return areaRepository.findById(areaId).orElseThrow(() -> new RuntimeException("Active area with id not found"));
     }
 
+    @Transactional
     @Override
-    public List<AreaDto> findAll() {
-        List<Area> allAreas = areaRepository.findAll();
+    public List<AreaDto> findAllActiveAreas() {
+        List<Area> allAreas = areaRepository.findByIsArchiveFalse();
         List<AreaDto> areaDtos = new ArrayList<>();
         for (Area area : allAreas) {
-            if (!area.getIsArchive()) {
-                areaDtos.add(new AreaDto(area.getName(), area.getAreaCode()));
-            }
+            areaDtos.add(new AreaDto(area.getName(), area.getAreaCode()));
         }
         return areaDtos;
     }
 
     @Override
     public AreaDto findByName(String name) {
-        Optional<Area> optionalArea = areaRepository.findByName(name);
+        Optional<Area> optionalArea = areaRepository.findByNameAndIsArchiveFalse(name);
         Area area = optionalArea.orElseThrow(RuntimeException::new);
-        if (!area.getIsArchive()) {
-            return new AreaDto(area.getName(), area.getAreaCode());
-        } else {
-            throw new RuntimeException("Active area with name not found");
-        }
+        return new AreaDto(area.getName(), area.getAreaCode());
     }
 
     @Override
     public AreaDto findByAreaCode(Long areaCode) {
-        Optional<Area> optionalArea = areaRepository.findByAreaCode(areaCode);
+        Optional<Area> optionalArea = areaRepository.findByAreaCodeAndIsArchiveFalse(areaCode);
         Area area = optionalArea.orElseThrow(RuntimeException::new);
-        if (!area.getIsArchive()) {
-            return new AreaDto(area.getName(), area.getAreaCode());
-        } else {
-            throw new RuntimeException("Active area with area code not found");
-        }
+        return new AreaDto(area.getName(), area.getAreaCode());
     }
 
     @Transactional

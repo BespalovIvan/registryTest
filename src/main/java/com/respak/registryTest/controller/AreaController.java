@@ -25,17 +25,17 @@ public class AreaController {
     }
 
     @GetMapping("")
-    public ResponseEntity<List<AreaDto>> findAllArea() {
-        return new ResponseEntity<>(areaService.findAll(), HttpStatus.OK);
+    public ResponseEntity<List<AreaDto>> findAllActiveArea() {
+        return new ResponseEntity<>(areaService.findAllActiveAreas(), HttpStatus.OK);
     }
 
     @GetMapping("/name/{name}")
-    public ResponseEntity<AreaDto> findByName(@PathVariable("name") String name) {
+    public ResponseEntity<AreaDto> findActiveAreaByName(@PathVariable("name") String name) {
         return new ResponseEntity<>(areaService.findByName(name), HttpStatus.OK);
     }
 
     @GetMapping("/areacode/{areaCode}")
-    public ResponseEntity<AreaDto> findByAreaCode(@PathVariable("areaCode") Long areaCode) {
+    public ResponseEntity<AreaDto> findActiveAreaByAreaCode(@PathVariable("areaCode") Long areaCode) {
         return new ResponseEntity<>(areaService.findByAreaCode(areaCode), HttpStatus.OK);
     }
 
