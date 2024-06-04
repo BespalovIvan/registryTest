@@ -36,9 +36,16 @@ public class FarmerController {
         farmerService.toArchive(farmerDto);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
     @PutMapping("/reArchive")
     public ResponseEntity<String> reArchival(@RequestBody FarmerDto farmerDto) {
         farmerService.reArchive(farmerDto);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<String> updateFarmer(@RequestBody FarmerDto farmerDto) {
+        farmerService.updateFarmer(farmerDto);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

@@ -4,6 +4,10 @@ import com.respak.registryTest.dto.FarmerAreaDto;
 import com.respak.registryTest.dto.FarmerDto;
 import com.respak.registryTest.entity.Area;
 import com.respak.registryTest.entity.Farmer;
+import com.respak.registryTest.exception.AreaNotFoundException;
+import com.respak.registryTest.exception.FarmerExistsException;
+import com.respak.registryTest.exception.FarmerNotFoundException;
+import com.respak.registryTest.exception.IncorrectDateFormatException;
 import com.respak.registryTest.repository.AreaRepository;
 import com.respak.registryTest.repository.FarmerRepository;
 import com.respak.registryTest.service.FarmerService;
@@ -28,6 +32,13 @@ public class FarmerServiceImpl implements FarmerService {
     @Transactional
     @Override
     public void addFarmer(FarmerDto farmerDto) {
+        Optional<Farmer> optionalByOrganizationName = farmerRepository
+                .findByOrganizationNameAndIsArchiveFalse(farmerDto.getOrganizationName());
+        Optional<Farmer> optionalByInn = farmerRepository.findByInnAndIsArchiveFalse(farmerDto.getInn());
+        Optional<Farmer> optionalByOgrn = farmerRepository.findByOgrn(farmerDto.getOgrn());
+        if (optionalByOrganizationName.isPresent() || optionalByOgrn.isPresent() || optionalByInn.isPresent()) {
+            throw new FarmerExistsException("Farmer exists!");
+        }
         farmerRepository.save(new Farmer(farmerDto.getOgrn(), farmerDto.getKpp(), farmerDto.getInn(),
                 farmerDto.getOrganizationalAndLegalForm(), farmerDto.getOrganizationName(), farmerDto.getFarmerId(),
                 farmerDto.getRegistrationDate(), false));
@@ -37,13 +48,23 @@ public class FarmerServiceImpl implements FarmerService {
     @Override
     public List<FarmerDto> findAllActiveFarmers() {
         List<Farmer> farmers = farmerRepository.findByIsArchiveFalse();
+        if (farmers.isEmpty()) {
+            throw new FarmerNotFoundException("Farmers not found!");
+        }
         List<FarmerDto> farmerDtoList = new ArrayList<>();
         for (Farmer farmer : farmers) {
-            FarmerAreaDto registrationAreaDto = new FarmerAreaDto(farmer.getRegistrationArea().getName());
+            Area areaRegistration = farmer.getRegistrationArea();
+            FarmerAreaDto registrationAreaDto;
+            if (areaRegistration == null) {
+                registrationAreaDto = new FarmerAreaDto("Not registered");
+            } else {
+                registrationAreaDto = new FarmerAreaDto(farmer.getRegistrationArea().getName());
+            }
             Set<Area> cropFieldsAreaSet = farmer.getCropFieldsArea();
             Set<FarmerAreaDto> cropFieldsAreaDtoSet = new HashSet<>();
             cropFieldsAreaSet.forEach((area) -> cropFieldsAreaDtoSet.add(new FarmerAreaDto(area.getName())));
-            farmerDtoList.add(new FarmerDto(farmer.getFarmerId(), farmer.getOrganizationName(),
+            farmerDtoList.add(new FarmerDto(farmer.getFarmerId(),
+                    farmer.getOrganizationName(),
                     farmer.getOrganizationalAndLegalForm(), farmer.getInn(), farmer.getKpp(),
                     farmer.getOgrn(), registrationAreaDto,
                     cropFieldsAreaDtoSet, farmer.getRegistrationDate()));
@@ -68,8 +89,15 @@ public class FarmerServiceImpl implements FarmerService {
     public FarmerDto findActiveFarmerByOrganizationName(String organizationName) {
         Optional<Farmer> optionalFarmer = farmerRepository.
                 findByOrganizationNameAndIsArchiveFalse(organizationName);
-        Farmer farmer = optionalFarmer.orElseThrow(() -> new RuntimeException("Active farmers with name not found"));
-        FarmerAreaDto registrationAreaDto = new FarmerAreaDto(farmer.getRegistrationArea().getName());
+        Farmer farmer = optionalFarmer
+                .orElseThrow(() -> new FarmerNotFoundException("Active farmers with name not found"));
+        Area areaRegistration = farmer.getRegistrationArea();
+        FarmerAreaDto registrationAreaDto;
+        if (areaRegistration == null) {
+            registrationAreaDto = new FarmerAreaDto("Not registered");
+        } else {
+            registrationAreaDto = new FarmerAreaDto(farmer.getRegistrationArea().getName());
+        }
         Set<Area> cropFieldsAreaSet = farmer.getCropFieldsArea();
         Set<FarmerAreaDto> cropFieldsAreaDtoSet = new HashSet<>();
         cropFieldsAreaSet.forEach((area) -> cropFieldsAreaDtoSet.add(new FarmerAreaDto(area.getName())));
@@ -84,10 +112,10 @@ public class FarmerServiceImpl implements FarmerService {
     public void registerFarmer(UUID farmerId, UUID areaId) {
         Optional<Farmer> optionalFarmer = farmerRepository.findById(farmerId);
         Optional<Area> registrationArea = areaRepository.findById(areaId);
-        registrationArea.ifPresent((area) -> optionalFarmer.ifPresent((farmer) -> {
-            farmer.setRegistrationArea(area);
-            farmerRepository.save(farmer);
-        }));
+        Farmer farmer = optionalFarmer.orElseThrow(() -> new FarmerNotFoundException("Farmer with id not found!"));
+        Area area = registrationArea.orElseThrow(() -> new AreaNotFoundException("Area with id not found!"));
+        farmer.setRegistrationArea(area);
+        farmerRepository.save(farmer);
     }
 
     @Transactional
@@ -95,25 +123,33 @@ public class FarmerServiceImpl implements FarmerService {
     public void addCropFieldToFarmer(UUID farmerId, UUID areaId) {
         Optional<Farmer> optionalFarmer = farmerRepository.findById(farmerId);
         Optional<Area> cropFieldArea = areaRepository.findById(areaId);
-        cropFieldArea.ifPresent((area) -> optionalFarmer.ifPresent((farmer) -> {
-            if (farmer.getCropFieldsArea() != null) {
-                farmer.getCropFieldsArea().add(area);
-            } else {
-                Set<Area> cropFieldsArea = new HashSet<>();
-                cropFieldsArea.add(area);
-                farmer.setCropFieldsArea(cropFieldsArea);
-            }
-            farmerRepository.save(farmer);
-        }));
+        Farmer farmer = optionalFarmer.orElseThrow(() -> new FarmerNotFoundException("Farmer with id not found!"));
+        Area area = cropFieldArea.orElseThrow(() -> new AreaNotFoundException("Area with id not found!"));
+        if (farmer.getCropFieldsArea() != null) {
+            farmer.getCropFieldsArea().add(area);
+        } else {
+            Set<Area> cropFieldsArea = new HashSet<>();
+            cropFieldsArea.add(area);
+            farmer.setCropFieldsArea(cropFieldsArea);
+        }
+        farmerRepository.save(farmer);
     }
+
 
     @Transactional
     @Override
     public FarmerDto findActiveFarmerByInn(Long inn) {
         Optional<Farmer> optionalFarmer = farmerRepository.
                 findByInnAndIsArchiveFalse(inn);
-        Farmer farmer = optionalFarmer.orElseThrow(() -> new RuntimeException("Active farmers with inn not found"));
-        FarmerAreaDto registrationAreaDto = new FarmerAreaDto(farmer.getRegistrationArea().getName());
+        Farmer farmer = optionalFarmer
+                .orElseThrow(() -> new FarmerNotFoundException("Active farmers with inn not found"));
+        Area areaRegistration = farmer.getRegistrationArea();
+        FarmerAreaDto registrationAreaDto;
+        if (areaRegistration == null) {
+            registrationAreaDto = new FarmerAreaDto("Not registered");
+        } else {
+            registrationAreaDto = new FarmerAreaDto(farmer.getRegistrationArea().getName());
+        }
         Set<Area> cropFieldsAreaSet = farmer.getCropFieldsArea();
         Set<FarmerAreaDto> cropFieldsAreaDtoSet = new HashSet<>();
         cropFieldsAreaSet.forEach((area) -> cropFieldsAreaDtoSet.add(new FarmerAreaDto(area.getName())));
@@ -127,11 +163,20 @@ public class FarmerServiceImpl implements FarmerService {
     @Override
     public List<FarmerDto> findActiveFarmerByRegistrationArea(UUID areaId) {
         Optional<Area> optionalArea = areaRepository.findById(areaId);
-        List<Farmer> farmers = farmerRepository.findByRegistrationAreaAndIsArchiveFalse(
-                optionalArea.orElseThrow(RuntimeException::new));
+        Area areaById = optionalArea.orElseThrow(() -> new AreaNotFoundException("Area with id not found!"));
+        List<Farmer> farmers = farmerRepository.findByRegistrationAreaAndIsArchiveFalse(areaById);
+        if(farmers.isEmpty()){
+            throw new FarmerNotFoundException("Farmer with registration this area not found!");
+        }
         List<FarmerDto> farmerDtoList = new ArrayList<>();
         for (Farmer farmer : farmers) {
-            FarmerAreaDto registrationAreaDto = new FarmerAreaDto(farmer.getRegistrationArea().getName());
+            Area areaRegistration = farmer.getRegistrationArea();
+            FarmerAreaDto registrationAreaDto;
+            if (areaRegistration == null) {
+                registrationAreaDto = new FarmerAreaDto("Not registered");
+            } else {
+                registrationAreaDto = new FarmerAreaDto(farmer.getRegistrationArea().getName());
+            }
             Set<Area> cropFieldsAreaSet = farmer.getCropFieldsArea();
             Set<FarmerAreaDto> cropFieldsAreaDtoSet = new HashSet<>();
             cropFieldsAreaSet.forEach((area) -> cropFieldsAreaDtoSet.add(new FarmerAreaDto(area.getName())));
@@ -152,7 +197,13 @@ public class FarmerServiceImpl implements FarmerService {
             List<Farmer> farmers = farmerRepository.findByRegistrationDateAndIsArchiveFalse(date);
             List<FarmerDto> farmerDtoList = new ArrayList<>();
             for (Farmer farmer : farmers) {
-                FarmerAreaDto registrationAreaDto = new FarmerAreaDto(farmer.getRegistrationArea().getName());
+                Area areaRegistration = farmer.getRegistrationArea();
+                FarmerAreaDto registrationAreaDto;
+                if (areaRegistration == null) {
+                    registrationAreaDto = new FarmerAreaDto("Not registered");
+                } else {
+                    registrationAreaDto = new FarmerAreaDto(farmer.getRegistrationArea().getName());
+                }
                 Set<Area> cropFieldsAreaSet = farmer.getCropFieldsArea();
                 Set<FarmerAreaDto> cropFieldsAreaDtoSet = new HashSet<>();
                 cropFieldsAreaSet.forEach((area) -> cropFieldsAreaDtoSet.add(new FarmerAreaDto(area.getName())));
@@ -163,18 +214,27 @@ public class FarmerServiceImpl implements FarmerService {
                 return farmerDtoList;
             }
         } catch (DateTimeParseException e) {
-            throw new RuntimeException("Incorrect date format");
+            throw new IncorrectDateFormatException("Incorrect date format");
         }
-        throw new RuntimeException("Active Farmer with registration date not found");
+        throw new FarmerNotFoundException("Active Farmer with registration date not found");
     }
 
     @Transactional
     @Override
     public List<FarmerDto> findByIsArchive(Boolean isArchive) {
         List<Farmer> farmers = farmerRepository.findByIsArchive(isArchive);
+        if (farmers.isEmpty()) {
+            throw new FarmerNotFoundException("Farmer not found!");
+        }
         List<FarmerDto> farmerDtoList = new ArrayList<>();
         for (Farmer farmer : farmers) {
-            FarmerAreaDto registrationAreaDto = new FarmerAreaDto(farmer.getRegistrationArea().getName());
+            Area areaRegistration = farmer.getRegistrationArea();
+            FarmerAreaDto registrationAreaDto;
+            if (areaRegistration == null) {
+                registrationAreaDto = new FarmerAreaDto("Not registered");
+            } else {
+                registrationAreaDto = new FarmerAreaDto(farmer.getRegistrationArea().getName());
+            }
             Set<Area> cropFieldsAreaSet = farmer.getCropFieldsArea();
             Set<FarmerAreaDto> cropFieldsAreaDtoSet = new HashSet<>();
             cropFieldsAreaSet.forEach((area) -> cropFieldsAreaDtoSet.add(new FarmerAreaDto(area.getName())));
@@ -184,5 +244,23 @@ public class FarmerServiceImpl implements FarmerService {
                     cropFieldsAreaDtoSet, farmer.getRegistrationDate()));
         }
         return farmerDtoList;
+    }
+
+    @Transactional
+    @Override
+    public void updateFarmer(FarmerDto farmerDto) {
+        Optional<Farmer> optionalFarmer = farmerRepository.findById(farmerDto.getFarmerId());
+        if (optionalFarmer.isPresent()) {
+            Farmer farmer = optionalFarmer.get();
+            farmer.setOrganizationName(farmerDto.getOrganizationName());
+            farmer.setOrganizationalAndLegalForm(farmerDto.getOrganizationalAndLegalForm());
+            farmer.setInn(farmerDto.getInn());
+            farmer.setKpp(farmerDto.getKpp());
+            farmer.setOgrn(farmerDto.getOgrn());
+            farmer.setRegistrationDate(farmerDto.getRegistrationDate());
+            farmerRepository.save(farmer);
+        } else {
+            throw new FarmerNotFoundException("Farmer with id not found! ");
+        }
     }
 }

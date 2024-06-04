@@ -34,6 +34,7 @@ public interface FarmerRepository extends JpaRepository<Farmer, UUID> {
     List<Farmer> findByRegistrationDateAndIsArchiveFalse(LocalDate registrationDate);
 
     List<Farmer> findByIsArchive(Boolean isArchive);
+    Optional<Farmer> findByOgrn(Long ogrn);
 }
 
 

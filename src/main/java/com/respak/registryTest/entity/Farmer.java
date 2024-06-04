@@ -1,6 +1,5 @@
 package com.respak.registryTest.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,15 +24,15 @@ public class Farmer {
     @Column(name = "farmer_id")
     private UUID farmerId;
     @NotEmpty
-    @Column(name = "organization_name")
+    @Column(name = "organization_name", nullable = false,unique = true)
     private String organizationName;
-    @Column(name = "organizational_and_legal_form")
+    @Column(name = "organizational_and_legal_form", nullable = false)
     private String organizationalAndLegalForm;
-    @Column(name = "inn")
+    @Column(name = "inn", nullable = false,unique = true)
     private Long inn;
-    @Column(name = "kpp")
+    @Column(name = "kpp", nullable = false)
     private Long kpp;
-    @Column(name = "ogrn")
+    @Column(name = "ogrn", nullable = false,unique = true)
     private Long ogrn;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "area_id")
@@ -47,9 +46,9 @@ public class Farmer {
             joinColumns = {@JoinColumn(name = "farmer_id")},
             inverseJoinColumns = {@JoinColumn(name = "area_id")})
     private Set<Area> cropFieldsArea;
-    @Column(name = "registration_date")
+    @Column(name = "registration_date", nullable = false)
     private LocalDate registrationDate;
-    @Column(name = "is_archive")
+    @Column(name = "is_archive", nullable = false)
     private Boolean isArchive;
 
     public Farmer(String organizationName, String organizationalAndLegalForm, Long inn, Long kpp, Long ogrn,

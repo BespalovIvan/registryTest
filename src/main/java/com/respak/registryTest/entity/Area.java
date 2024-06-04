@@ -1,6 +1,7 @@
 package com.respak.registryTest.entity;
 
 import lombok.*;
+import org.hibernate.validator.constraints.UniqueElements;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -20,11 +21,11 @@ public class Area {
     @Column(name = "area_id")
     private UUID areaId;
     @NotEmpty(message = "name cannot be empty")
-    @Column(name = "name")
+    @Column(name = "name",nullable = false,unique = true)
     private String name;
-    @Column(name = "area_code")
+    @Column(name = "area_code",nullable = false,unique = true)
     private Long areaCode;
-    @Column(name = "is_archive")
+    @Column(name = "is_archive",nullable = false)
     private Boolean isArchive;
     @OneToMany(mappedBy = "registrationArea",cascade = CascadeType.ALL,orphanRemoval = true)
     private Set<Farmer> registrationFarmers;

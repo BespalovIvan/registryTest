@@ -2,6 +2,8 @@ package com.respak.registryTest.service.impl;
 
 import com.respak.registryTest.dto.AreaDto;
 import com.respak.registryTest.entity.Area;
+import com.respak.registryTest.exception.AreaExistsException;
+import com.respak.registryTest.exception.AreaNotFoundException;
 import com.respak.registryTest.repository.AreaRepository;
 import com.respak.registryTest.service.AreaService;
 import org.springframework.stereotype.Service;
@@ -20,20 +22,30 @@ public class AreaServiceImpl implements AreaService {
         this.areaRepository = areaRepository;
     }
 
+    @Transactional
     @Override
     public void addArea(AreaDto areaDto) {
+        Optional<Area> optionalByAreaCode = areaRepository.findByAreaCodeAndIsArchiveFalse(areaDto.getAreaCode());
+        Optional<Area> optionalByName = areaRepository.findByNameAndIsArchiveFalse(areaDto.getName());
+        if (optionalByAreaCode.isPresent() || optionalByName.isPresent()) {
+            throw new AreaExistsException("Area exists");
+        }
         areaRepository.save(new Area(areaDto.getName(), areaDto.getAreaCode(), false));
     }
 
     @Override
     public Area findById(UUID areaId) {
-        return areaRepository.findById(areaId).orElseThrow(() -> new RuntimeException("Active area with id not found"));
+        return areaRepository.findById(areaId)
+                .orElseThrow(() -> new AreaNotFoundException("Active area with id not found!"));
     }
 
     @Transactional
     @Override
     public List<AreaDto> findAllActiveAreas() {
         List<Area> allAreas = areaRepository.findByIsArchiveFalse();
+        if (allAreas.isEmpty()) {
+            throw new AreaNotFoundException("Active Area not found!");
+        }
         List<AreaDto> areaDtos = new ArrayList<>();
         for (Area area : allAreas) {
             areaDtos.add(new AreaDto(area.getName(), area.getAreaCode()));
@@ -44,14 +56,14 @@ public class AreaServiceImpl implements AreaService {
     @Override
     public AreaDto findByName(String name) {
         Optional<Area> optionalArea = areaRepository.findByNameAndIsArchiveFalse(name);
-        Area area = optionalArea.orElseThrow(RuntimeException::new);
+        Area area = optionalArea.orElseThrow(() -> new AreaNotFoundException("Active Area with name not found!"));
         return new AreaDto(area.getName(), area.getAreaCode());
     }
 
     @Override
     public AreaDto findByAreaCode(Long areaCode) {
         Optional<Area> optionalArea = areaRepository.findByAreaCodeAndIsArchiveFalse(areaCode);
-        Area area = optionalArea.orElseThrow(RuntimeException::new);
+        Area area = optionalArea.orElseThrow(() -> new AreaNotFoundException("Active area with area code not found!"));
         return new AreaDto(area.getName(), area.getAreaCode());
     }
 

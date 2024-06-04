@@ -27,4 +27,6 @@ public interface FarmerService {
     List<FarmerDto> findByRegistrationDate(String registrationDate);
 
     List<FarmerDto> findByIsArchive(Boolean isArchive);
+
+    void updateFarmer(FarmerDto farmerDto);
 }

@@ -44,4 +44,16 @@ public class FarmerDto {
         this.cropFieldsArea = cropFieldsArea;
         this.registrationDate = registrationDate;
     }
+
+    public FarmerDto(UUID farmerId, String organizationName, String organizationalAndLegalForm,
+                     Long inn, Long kpp,
+                     Long ogrn, LocalDate registrationDate) {
+        this.farmerId = farmerId;
+        this.organizationName = organizationName;
+        this.organizationalAndLegalForm = organizationalAndLegalForm;
+        this.inn = inn;
+        this.kpp = kpp;
+        this.ogrn = ogrn;
+        this.registrationDate = registrationDate;
+    }
 }
