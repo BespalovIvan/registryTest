@@ -22,6 +22,7 @@ public interface FarmerRepository extends JpaRepository<Farmer, UUID> {
     @Modifying
     @Query("UPDATE Farmer SET isArchive = false WHERE id = :farmer_id ")
     void reArchive(@Param("farmer_id") UUID farmerId);
+    Optional<Farmer> findByOrganizationNameAndInnAndOgrnAndIsArchiveFalse(String organizationName,Long inn, Long ogrn);
 
     Optional<Farmer> findByOrganizationNameAndIsArchiveFalse(String organizationName);
 

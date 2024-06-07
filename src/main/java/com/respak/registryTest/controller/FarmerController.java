@@ -19,14 +19,14 @@ public class FarmerController {
         this.farmerService = farmerService;
     }
 
-    @PostMapping("")
+    @PostMapping
     public ResponseEntity<String> createFarmer(@RequestBody FarmerDto farmerDto) {
         farmerService.addFarmer(farmerDto);
         return new ResponseEntity<>(HttpStatus.OK);
 
     }
 
-    @GetMapping("")
+    @GetMapping
     public ResponseEntity<List<FarmerDto>> findAllActiveFarmers() {
         return new ResponseEntity<>(farmerService.findAllActiveFarmers(), HttpStatus.OK);
     }

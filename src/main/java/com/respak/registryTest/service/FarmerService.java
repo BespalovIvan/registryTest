@@ -2,6 +2,7 @@ package com.respak.registryTest.service;
 
 import com.respak.registryTest.dto.FarmerDto;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,4 +30,5 @@ public interface FarmerService {
     List<FarmerDto> findByIsArchive(Boolean isArchive);
 
     void updateFarmer(FarmerDto farmerDto);
+    LocalDate toDateFormat(String date);
 }

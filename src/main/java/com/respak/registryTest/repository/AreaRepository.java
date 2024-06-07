@@ -18,6 +18,8 @@ public interface AreaRepository extends JpaRepository<Area, UUID> {
 
     Optional<Area> findByAreaCodeAndIsArchiveFalse(Long areaCode);
 
+    Optional<Area> findByAreaCodeAndNameAndIsArchiveFalse(Long areaCode,String name);
+
     @Modifying
     @Query("UPDATE Area SET name = :name, area_code = :area_code WHERE id = :area_id ")
     void updateArea(@Param("name") String name,@Param("area_code") Long areaCode,@Param("area_id") UUID areaId);

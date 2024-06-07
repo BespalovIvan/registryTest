@@ -18,13 +18,13 @@ public class AreaController {
         this.areaService = areaService;
     }
 
-    @PostMapping("")
+    @PostMapping
     public ResponseEntity<String> createArea(@Validated @RequestBody AreaDto areaDto) {
         areaService.addArea(areaDto);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("")
+    @GetMapping
     public ResponseEntity<List<AreaDto>> findAllActiveArea() {
         return new ResponseEntity<>(areaService.findAllActiveAreas(), HttpStatus.OK);
     }
@@ -39,7 +39,7 @@ public class AreaController {
         return new ResponseEntity<>(areaService.findByAreaCode(areaCode), HttpStatus.OK);
     }
 
-    @PutMapping("")
+    @PutMapping
     public ResponseEntity<String> updateArea(@RequestBody AreaDto areaDto) {
         areaService.updateArea(areaDto);
         return new ResponseEntity<>(HttpStatus.OK);

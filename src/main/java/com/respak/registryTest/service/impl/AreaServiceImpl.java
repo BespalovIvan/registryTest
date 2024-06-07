@@ -25,9 +25,9 @@ public class AreaServiceImpl implements AreaService {
     @Transactional
     @Override
     public void addArea(AreaDto areaDto) {
-        Optional<Area> optionalByAreaCode = areaRepository.findByAreaCodeAndIsArchiveFalse(areaDto.getAreaCode());
-        Optional<Area> optionalByName = areaRepository.findByNameAndIsArchiveFalse(areaDto.getName());
-        if (optionalByAreaCode.isPresent() || optionalByName.isPresent()) {
+        Optional<Area> optionalByAreaCodeAndName = areaRepository
+                .findByAreaCodeAndNameAndIsArchiveFalse(areaDto.getAreaCode(), areaDto.getName());
+        if (optionalByAreaCodeAndName.isPresent()) {
             throw new AreaExistsException("Area exists");
         }
         areaRepository.save(new Area(areaDto.getName(), areaDto.getAreaCode(), false));
@@ -55,15 +55,18 @@ public class AreaServiceImpl implements AreaService {
 
     @Override
     public AreaDto findByName(String name) {
-        Optional<Area> optionalArea = areaRepository.findByNameAndIsArchiveFalse(name);
-        Area area = optionalArea.orElseThrow(() -> new AreaNotFoundException("Active Area with name not found!"));
+        Area area = areaRepository
+                .findByNameAndIsArchiveFalse(name)
+                .orElseThrow(() -> new AreaNotFoundException("Active Area with name not found!"));
         return new AreaDto(area.getName(), area.getAreaCode());
     }
 
     @Override
     public AreaDto findByAreaCode(Long areaCode) {
-        Optional<Area> optionalArea = areaRepository.findByAreaCodeAndIsArchiveFalse(areaCode);
-        Area area = optionalArea.orElseThrow(() -> new AreaNotFoundException("Active area with area code not found!"));
+
+        Area area = areaRepository
+                .findByAreaCodeAndIsArchiveFalse(areaCode)
+                .orElseThrow(() -> new AreaNotFoundException("Active area with area code not found!"));
         return new AreaDto(area.getName(), area.getAreaCode());
     }
 
